@@ -196,7 +196,7 @@
 	        });
 
 	        // 分娩可能な最寄り病院ヒートマップの追加
-	        var heatmapMatanityUrl = '/data/tile_matanity_delivery/{z}/{x}/{y}.png';
+	        var heatmapMatanityUrl = './data/tile_matanity_delivery/{z}/{x}/{y}.png';
 	        var heatmapMatanityOption = {
 	            opacity: 1.0,
 	            maxNativeZoom: 10,
