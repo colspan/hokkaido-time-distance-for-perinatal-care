@@ -8,13 +8,13 @@ export default class LCaptionControl{
   constructor(options){
     var defaults = {
       title : 'title',
-      subtitle : 'subtitle',
-      subsubtitle : 'subsubtitle',
-      caption_sizes : [32, 20, 20]
+      subTitle : 'subTitle',
+      subSubTitle : 'subSubTitle',
+      captionSizes : [32, 20, 20]
     }
     this.options = Object.assign(defaults, options)
 
-    const captions = ['title', 'subtitle', 'subsubtitle']
+    const captions = ['title', 'subTitle', 'subSubTitle']
     var self = this
     var captionWindow = L.Control.extend({
       options: {
@@ -29,7 +29,7 @@ export default class LCaptionControl{
           .data(captions)
           .enter()
           .append('div')
-          .style('font-size',function(d,i){return self.options.caption_sizes[i]+'pt'})
+          .style('font-size',function(d,i){return self.options.captionSizes[i]+'pt'})
           .text(function(d){return self.options[d]})
 
         return container
@@ -43,7 +43,7 @@ export default class LCaptionControl{
   update(options){
     this.options = Object.assign(this.options, options)
     var self = this
-    var caption_elems = this.captionContainer.selectAll('div')
+    var captionElems = this.captionContainer.selectAll('div')
         .text(function(d){return self.options[d]});
   }
 }

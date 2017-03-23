@@ -5,11 +5,11 @@ import * as L from 'leaflet'
 //import * as Rickshaw from 'rickshaw'
 
 import GeoJsonLoader   from './geojsonloader.js'
-import LGeoJsonLayer   from './l_layer_geojson.js'
-import LLegendControl  from './l_control_legend.js'
-import LCaptionControl from './l_control_caption.js'
+import LGeoJsonLayer   from './l-layer-geojson.js'
+import LLegendControl  from './l-control-legend.js'
+import LCaptionControl from './l-control-caption.js'
 import GeoStatisticalData from './geostatisticaldata.js'
-import { get_color_img, duration_to_color } from './color_helper.js'
+import { getColorImg, durationToColor } from './color-helper.js'
 
 L.Icon.Default.imagePath = './build/'
 L.Icon.Default.mergeOptions({
@@ -32,9 +32,9 @@ const map_data_files = {
 
 // GeoJSONファイルの読み出し
 function load_geojson(){
-    var x = new GeoJsonLoader({geodata_files:['data/01_hokkaido_topo.json']})
-    var geojson_loader = x.get_loader()
-    return geojson_loader
+    var x = new GeoJsonLoader({geodataFiles:['data/01_hokkaido_topo.json']})
+    var getjsonLoader = x.getLoader()
+    return getjsonLoader
 }
 // 統計データの読み込み
 function load_csv_files(data_file_def){
@@ -88,7 +88,7 @@ function start_app(loaded_data){
     function create_elements(){
         // GeoJSONレイヤーの初期化
         var lgeojson_option = {
-            map_filler : d => {return 'rgba(255,255,255,0.2)'}
+            mapFiller : d => {return 'rgba(255,255,255,0.2)'}
         }
         lgeojson = new LGeoJsonLayer(geo_obj, lgeojson_option)
         var leaflet_option = {
@@ -131,8 +131,8 @@ function start_app(loaded_data){
         // タイトルコントロールを追加
         lcaption = new LCaptionControl({
             title : '最寄りの分娩可能な産婦人科への時間距離',
-            subtitle : '',
-            subsubtitle : ''
+            subTitle : '',
+            subSubTitle : ''
         })
         map.addControl(lcaption.get())
 
@@ -165,8 +165,8 @@ function start_app(loaded_data){
 
     // データをUIとひも付け
     function bind_statistical_data_to_ui(){
-        var duration_data = statistical_data.duration.get_by_column_name('時間距離 平均')
-        var population_data = statistical_data.duration.get_by_column_name('人口')
+        var duration_data = statistical_data.duration.getByColumnName('時間距離 平均')
+        var population_data = statistical_data.duration.getByColumnName('人口')
 
         // leafletのGeoJSONレイヤーとデータをひも付け
 
@@ -181,26 +181,26 @@ function start_app(loaded_data){
             formatted += sec+"秒"
             return formatted
         }
-        var color_scale = d3.scaleLinear().domain(duration_data.domain).range(["white", "#6a1b9a"])
+        var colorScale = d3.scaleLinear().domain(duration_data.domain).range(["white", "#6a1b9a"])
 
         // ヒートマップの着色条件
-        var map_filler = x => {
-            var value = duration_data.parsed_data[x.commune_id]
-            return color_scale(value*4.5)
+        var mapFiller = x => {
+            var value = duration_data.parsedData[x.communeId]
+            return colorScale(value*4.5)
         }
 
         // GeoJSONの各要素の書式設定
-        var eachfeature = (parent, x, layer) => {
-            var commune_id = x.commune_id
+        var eachFeature = (parent, x, layer) => {
+            var communeId = x.communeId
             var commune_name = x.properties.N03_003 == '札幌市' ? '札幌市' : x.name
-            var target_value = formatter(duration_data.parsed_data[x.commune_id])
+            var target_value = formatter(duration_data.parsedData[x.communeId])
             var popup_elem = document.createElement('span')
             popup_elem.addEventListener('click', x => {
                 // TODO
             })
             popup_elem.innerHTML = '<span class="layer_tooltip">' + commune_name + '</span>'
                                  + '<br /><span class="badge">平均 : ' + target_value + '</span>'
-                                 + '<br /><span class="badge">人口 : ' + d3.format('0,d')(population_data.parsed_data[x.commune_id]) + '人</span>'
+                                 + '<br /><span class="badge">人口 : ' + d3.format('0,d')(population_data.parsedData[x.communeId]) + '人</span>'
             layer.bindTooltip(popup_elem)
             var update_infopanel = () => {
                 // 市町村名を表示する
@@ -213,7 +213,7 @@ function start_app(loaded_data){
                 commune_name.innerHTML = '時間距離別の人口'
                 linfopanel._container.appendChild(commune_name)
                 // ヒストグラムを表示する
-                var histogram_data = statistical_data.population_histogram.data[x.commune_id]
+                var histogram_data = statistical_data.population_histogram.data[x.communeId]
                 var plot_data = []
                 Object.keys(histogram_data).slice(1, 20).forEach((key, i) => {
                     // データを整形する
@@ -245,11 +245,11 @@ function start_app(loaded_data){
                 var cells = histogram_rows.selectAll('td')
                     .data(row=>{
                         var columns = []
-                        var colors = Array.apply(null, Array(row.to-row.from)).map((_, i)=>{return duration_to_color((row.from+i)*60)})
+                        var colors = Array.apply(null, Array(row.to-row.from)).map((_, i)=>{return durationToColor((row.from+i)*60)})
                         columns.push( '〜' + row.to + '分' )
                         columns.push( d3.format('0,d')(row.population) )
                         columns.push( d3.format('.2%')(row.population_ratio) )
-                        columns.push( '<img src="'+get_color_img(colors)+'" width="'+parseInt(row.population_ratio*100)+'" height="10">' )
+                        columns.push( '<img src="'+getColorImg(colors)+'" width="'+parseInt(row.population_ratio*100)+'" height="10">' )
                         return columns
                     })
                     .enter()
@@ -270,7 +270,7 @@ function start_app(loaded_data){
                                 return y.feature.properties.N03_003 == x.properties.N03_003
                             }
                             else{
-                                return y.feature.commune_id == commune_id
+                                return y.feature.communeId == communeId
                             }
                         })
                         .forEach(y => {
@@ -289,7 +289,7 @@ function start_app(loaded_data){
                                 return y.feature.properties.N03_003 == x.properties.N03_003
                             }
                             else{
-                                return y.feature.commune_id == commune_id
+                                return y.feature.communeId == communeId
                             }
                         })
                         .forEach(y => {
@@ -302,7 +302,7 @@ function start_app(loaded_data){
             })
 
         }
-        lgeojson.update({map_filler:map_filler, eachfeature:eachfeature})
+        lgeojson.update({mapFiller:mapFiller, eachFeature:eachFeature})
     }
 
 }

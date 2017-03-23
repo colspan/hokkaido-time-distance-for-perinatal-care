@@ -1,6 +1,6 @@
 'use strict'
 
-function get_color_img(colors){
+function getColorImg(colors){
     var canvas = document.createElement("canvas");
     var ctx = canvas.getContext('2d')
     canvas.width = colors.length
@@ -22,7 +22,7 @@ function get_color_img(colors){
  120分 : 300 deg, 1.0, 0.0 # black
  Opacityは30分から360分まで線形で消えていく
 */
-function duration_to_color(second){
+function durationToColor(second){
     var opacity_ratio
     var hsl_hue = (+second)/3600*(300-60)+60
     if (hsl_hue > 300){
@@ -44,4 +44,4 @@ function duration_to_color(second){
     return color
 }
 
-export {get_color_img, duration_to_color}
+export {getColorImg, durationToColor}
